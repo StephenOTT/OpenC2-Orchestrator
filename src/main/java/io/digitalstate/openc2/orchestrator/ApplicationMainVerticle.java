@@ -1,5 +1,6 @@
 package io.digitalstate.openc2.orchestrator;
 
+import io.digitalstate.openc2.orchestrator.tcp.TcpServerVerticle;
 import io.digitalstate.openc2.orchestrator.verticles.Service1Verticle;
 import io.digitalstate.openc2.orchestrator.verticles.Service2Verticle;
 import io.vertx.core.AbstractVerticle;
@@ -25,14 +26,16 @@ public class ApplicationMainVerticle extends AbstractVerticle {
         logger.info("Starting Vertx Main Verticle");
         startFuture.complete();
 
-        StartService1();
-        StartService2();
+        startService1();
+        startService2();
+        startTcpServerService();
+
 
         logger.info("Service 1 will be stopped after 25 seconds");
         vertx.setTimer(25000,act-> vertx.eventBus().publish("service1-stop",""));
     }
 
-    private void StartService1() {
+    private void startService1() {
         DeploymentOptions options = new DeploymentOptions();
         vertx.deployVerticle(Service1Verticle.class, options, res ->{
             if (res.succeeded()){
@@ -43,13 +46,24 @@ public class ApplicationMainVerticle extends AbstractVerticle {
         });
     }
 
-    private void StartService2() {
+    private void startService2() {
         DeploymentOptions options = new DeploymentOptions();
         vertx.deployVerticle(Service2Verticle.class, options, res->{
             if (res.succeeded()){
                 logger.info("Service 2 has deployed");
             } else {
                 logger.error("Service 2 failed to deploy");
+            }
+        });
+    }
+
+    private void startTcpServerService() {
+        DeploymentOptions options = new DeploymentOptions();
+        vertx.deployVerticle(TcpServerVerticle.class, options, res->{
+            if (res.succeeded()){
+                logger.info("TCP-Server Verticle has deployed");
+            } else {
+                logger.error("TCP-Server Verticle failed to deploy", res.cause());
             }
         });
     }
