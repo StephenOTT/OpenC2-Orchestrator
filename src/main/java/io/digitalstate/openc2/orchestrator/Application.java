@@ -1,6 +1,7 @@
 package io.digitalstate.openc2.orchestrator;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,8 @@ public class Application {
 
     @EventListener(ApplicationReadyEvent.class)
     public void doSomethingAfterStartup() {
-        logger.info("Camunda has finished starting up");
-        Vertx.vertx().deployVerticle(mainVerticle);
+        logger.info("Camunda finished starting up");
+        VertxOptions options = new VertxOptions();
+        Vertx.vertx(options).deployVerticle(mainVerticle);
     }
 }
